@@ -11,7 +11,7 @@ Paste the command for your client as one line. Each one installs and then starts
 | Claude Code terminal | `claude plugin marketplace add xavadao/xinf-plugin && claude plugin install xinf@xinf --config base_url=https://zinf.ai && claude mcp login plugin:xinf:xinf` | Allow in the browser |
 | Codex terminal | `codex plugin marketplace add xavadao/xinf-plugin && codex plugin add xinf@xinf && codex mcp login xinf` | Allow in the browser |
 | Gemini terminal | `gemini extensions install https://github.com/xavadao/xinf-plugin --consent && gemini` | Gemini asks "Authentication required for MCP Server: xinf ... continue?": Enter, then Allow |
-| Cursor terminal | `curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/add-mcp.mjs \| node --input-type=module - cursor && cursor-agent mcp login xinf` | Allow in the browser (the server is in `~/.cursor/mcp.json`, so the Cursor app has it too) |
+| Cursor terminal | `curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/add-mcp.mjs \| node --input-type=module - cursor --login` | Allow in the browser: `--login` runs `cursor-agent mcp login xinf` when the Cursor CLI is installed; without it, the Cursor app lists `xinf` (from `~/.cursor/mcp.json`) under Settings > MCP: click "Needs login" |
 | Cursor chat | `/add-plugin https://github.com/xavadao/xinf-plugin` | Settings > MCP: click "Needs login" next to `xinf`, then Allow |
 | OpenCode terminal | `curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/install-opencode.sh \| sh && opencode mcp auth xinf` | Allow in the browser |
 | Pi terminal | `pi install git:github.com/xavadao/xinf-plugin@v0.1.1 && pi "/mcp-auth xinf"` | Allow in the browser |

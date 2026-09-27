@@ -13,7 +13,7 @@ Never ask the user to paste a key or token into this chat, never read or print `
 - Claude Desktop or claude.ai: Settings > Connectors > Add custom connector, URL `<origin>/mcp/account`, then Connect.
 - Codex: `codex mcp login xinf` (a fresh `codex mcp add xinf --url <origin>/mcp/account` starts it by itself).
 - Gemini CLI: it asks on start ("Authentication required for MCP Server: xinf ... continue?"): Enter. Later, or if dismissed: `/mcp auth xinf`.
-- Cursor: in a terminal `cursor-agent mcp login xinf` (also `agent mcp login xinf`); in the app, Settings > MCP, click "Needs login" next to `xinf`. Not configured yet: `curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/add-mcp.mjs | node --input-type=module - cursor`.
+- Cursor: in a terminal `cursor-agent mcp login xinf` (also `agent mcp login xinf`); in the app, Settings > MCP, click "Needs login" next to `xinf`. Not configured yet: `curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/add-mcp.mjs | node --input-type=module - cursor --login` (adds it and runs the CLI login).
 - OpenCode: `opencode mcp auth xinf` (the installer puts the server in `~/.config/opencode/opencode.json`).
 - Pi: `/mcp-auth xinf` (or `pi "/mcp-auth xinf"` from a terminal).
 - Kimi Code: `/mcp-config login plugin-xinf:xinf` (installed as a plugin) or `/mcp-config login xinf` (added to `~/.kimi-code/mcp.json`); Kimi must be signed in, the login runs through its model.

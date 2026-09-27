@@ -2,12 +2,13 @@
 // Add the Xava Inference MCP server (sign-in endpoint <origin>/mcp/account, no key) to a client's MCP config file,
 // keeping every other entry. No dependencies; Node 18+.
 //   curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/add-mcp.mjs | node - cursor
-//   node scripts/add-mcp.mjs <cursor|windsurf|cline|kimi> [--base-url https://zinf.dev]   (or XINF_BASE_URL)
-// Then the client signs in with the browser: Cursor CLI `cursor-agent mcp login xinf`, Cursor / Windsurf / Cline:
-// click the server's login button, Kimi Code: `/mcp-config login xinf`.
+//   node scripts/add-mcp.mjs <cursor|windsurf|cline|kimi> [--base-url https://zinf.dev] [--login]   (or XINF_BASE_URL)
+// Then the client signs in with the browser: Cursor CLI `cursor-agent mcp login xinf` (--login runs it when the Cursor
+// CLI is installed), Cursor / Windsurf / Cline: click the server's login button, Kimi Code: `/mcp-config login xinf`.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 export const DEFAULT_BASE_URL = "https://zinf.ai";
 
@@ -19,7 +20,7 @@ export function targets(client, env = process.env, platform = process.platform) 
     : path.join(env.XDG_CONFIG_HOME || path.join(home, ".config"), "Code/User");
   switch (client) {
     case "cursor":
-      return { files: [path.join(home, ".cursor/mcp.json")], entry: (url) => ({ url }), next: "Cursor: Settings > MCP, click \"Needs login\" next to xinf. Cursor CLI: cursor-agent mcp login xinf" };
+      return { files: [path.join(home, ".cursor/mcp.json")], entry: (url) => ({ url }), login: ["cursor-agent", ["mcp", "login", "xinf"]], next: "Cursor: Settings > MCP, click \"Needs login\" next to xinf. Cursor CLI: cursor-agent mcp login xinf" };
     case "windsurf": {
       // Windsurf; newer builds (Devin Desktop) read ~/.config/devin/mcp_config.json
       const devin = path.join(env.XDG_CONFIG_HOME || path.join(home, ".config"), "devin/mcp_config.json");
@@ -54,8 +55,15 @@ export function addServer(file, entry) {
   fs.writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`);
 }
 
-export function main(argv = process.argv.slice(2), env = process.env) {
-  const client = argv.find((a) => !a.startsWith("--") && argv[argv.indexOf(a) - 1] !== "--base-url");
+/** Is `cmd` an executable on PATH? */
+function onPath(cmd, env) {
+  return (env.PATH || "").split(path.delimiter).some((d) => {
+    try { fs.accessSync(path.join(d, cmd), fs.constants.X_OK); return true; } catch { return false; }
+  });
+}
+
+export function main(argv = process.argv.slice(2), env = process.env, run = spawnSync) {
+  const client = argv.find((a, k) => !a.startsWith("--") && argv[k - 1] !== "--base-url");
   const i = argv.indexOf("--base-url");
   const origin = (i >= 0 ? argv[i + 1] : env.XINF_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
   const t = targets(client, env);
@@ -71,6 +79,11 @@ export function main(argv = process.argv.slice(2), env = process.env) {
   for (const file of t.files) {
     addServer(file, t.entry(url));
     console.log(`Added xinf (${url}) to ${file}`);
+  }
+  if (argv.includes("--login") && t.login && onPath(t.login[0], env)) {
+    // the client's own login: opens the browser at once and waits for the Allow
+    console.log(`Signing in: ${t.login[0]} ${t.login[1].join(" ")}`);
+    return run(t.login[0], t.login[1], { stdio: ["ignore", "inherit", "inherit"], env }).status ?? 1;
   }
   console.log(`Next, sign in with the browser. ${t.next}`);
   return 0;

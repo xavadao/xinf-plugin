@@ -135,7 +135,7 @@ test("Pi adapter preserves other servers and references the key by name only", (
 test("README exposes one pasteable bootstrap command per client", () => {
   const readme = read("README.md");
   // each row: | client | `one command` | what is left (the browser sign-in starts right after the command) |
-  const clients = { "Claude Code terminal": "claude mcp login", "Codex terminal": "codex mcp login", "Cursor terminal": "cursor-agent mcp login xinf", "Cursor chat": "/add-plugin", "Kimi chat": "/plugins install", "Gemini terminal": "&& gemini`", "OpenCode terminal": "opencode mcp auth xinf", "Pi terminal": "pi \"/mcp-auth xinf\"" };
+  const clients = { "Claude Code terminal": "claude mcp login", "Codex terminal": "codex mcp login", "Cursor terminal": "- cursor --login", "Cursor chat": "/add-plugin", "Kimi chat": "/plugins install", "Gemini terminal": "&& gemini`", "OpenCode terminal": "opencode mcp auth xinf", "Pi terminal": "pi \"/mcp-auth xinf\"" };
   for (const [client, signin] of Object.entries(clients)) {
     const row = readme.split("\n").find((line) => line.startsWith(`| ${client} |`));
     assert.ok(row, `missing bootstrap row for ${client}`);
@@ -279,6 +279,16 @@ test("add-mcp adds the sign-in server to Cursor / Windsurf / Cline / Kimi config
     assert.match(cline.files[0], /Library\/Application Support\/Code\/User\/globalStorage\/saoudrizwan\.claude-dev\/settings\/cline_mcp_settings\.json$/);
     assert.deepEqual(cline.entry(MCP_URL), readJson("clients/cline/cline_mcp_settings.json").mcpServers.xinf);
     assert.equal(addMcp(["nope"], env), 2);
+    // --login runs the Cursor CLI's own login when it is installed, and only then
+    const bin = path.join(home, "bin");
+    fs.mkdirSync(bin);
+    const calls = [];
+    const fake = (cmd, args) => { calls.push([cmd, ...args]); return { status: 0 }; };
+    assert.equal(addMcp(["cursor", "--login"], { ...env, PATH: bin }, fake), 0);
+    assert.equal(calls.length, 0, "no Cursor CLI on PATH: no login run");
+    fs.writeFileSync(path.join(bin, "cursor-agent"), "#!/bin/sh\n", { mode: 0o755 });
+    assert.equal(addMcp(["cursor", "--base-url", "https://staging.example", "--login"], { ...env, PATH: bin }, fake), 0);
+    assert.deepEqual(calls, [["cursor-agent", "mcp", "login", "xinf"]]);
     fs.writeFileSync(cursor, "{ not json");
     assert.throws(() => addMcp(["cursor"], env), /not valid JSON/);
   } finally {
