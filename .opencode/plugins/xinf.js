@@ -32,14 +32,12 @@ export const XinfPlugin = async () => ({
     config.skills.paths ??= [];
     if (!config.skills.paths.includes(skillsDir)) config.skills.paths.push(skillsDir);
     config.mcp ??= {};
-    // MCP sign-in: /mcp/account refuses a keyless connection with 401, so OpenCode offers `opencode mcp auth xinf`
-    // (browser sign-in). With XINF_API_KEY set, the key is sent instead.
-    config.mcp.xinf = {
-      type: "remote",
-      url: `${origin}/mcp/account`,
-      enabled: true,
-      ...(key ? { headers: { Authorization: `Bearer ${key}` } } : {}),
-    };
+    // MCP sign-in: /mcp/account refuses a keyless connection with 401, so OpenCode signs in with the browser
+    // (`opencode mcp auth xinf`). The installer also writes this server into opencode.json, because the `opencode mcp`
+    // commands read the config files without running plugins; an entry there (its origin included) wins over this one.
+    // With XINF_API_KEY set, the key is sent instead.
+    config.mcp.xinf ??= { type: "remote", url: `${origin}/mcp/account`, enabled: true };
+    if (key) config.mcp.xinf.headers = { ...config.mcp.xinf.headers, Authorization: `Bearer ${key}` };
     if (key) {
       config.provider ??= {};
       config.provider.xinf ??= {

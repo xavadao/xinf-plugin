@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { XinfPlugin, baseUrl } from "../.opencode/plugins/xinf.js";
+import { main as addMcp, targets } from "../scripts/add-mcp.mjs";
 import { BASE_URL, FORBIDDEN, LOCAL_KEY_SETUP, MCP_URL, REPO, SECRETS, pkg, read, readJson, root, textFiles } from "../scripts/lib.mjs";
 
 const withEnv = async (vars, fn) => {
@@ -66,6 +67,42 @@ test("OpenCode adapter registers skills and the MCP server, keyless and keyed", 
     assert.equal(config.provider.xinf.options.apiKey, "{env:XINF_API_KEY}");
   });
   assert.equal(baseUrl({}), BASE_URL);
+  // a server already in opencode.json (written by the installer, maybe another origin) is kept; a key adds the header
+  await withEnv({ XINF_API_KEY: "xk_test_dummy", XINF_BASE_URL: undefined }, async () => {
+    const config = { mcp: { xinf: { type: "remote", url: "https://staging.example/mcp/account", enabled: true } } };
+    await (await XinfPlugin({})).config(config);
+    assert.equal(config.mcp.xinf.url, "https://staging.example/mcp/account");
+    assert.equal(config.mcp.xinf.headers.Authorization, "Bearer xk_test_dummy");
+  });
+});
+
+test("OpenCode installer writes the MCP server into opencode.json (the `opencode mcp` commands skip plugins), keeping other entries", () => {
+  const cfg = fs.mkdtempSync(path.join(os.tmpdir(), "xinf-oc-"));
+  const src = fs.mkdtempSync(path.join(os.tmpdir(), "xinf-oc-src-"));
+  try {
+    // a throwaway git repo holding the adapter, as the clone source
+    fs.mkdirSync(path.join(src, ".opencode/plugins"), { recursive: true });
+    fs.copyFileSync(path.join(root, ".opencode/plugins/xinf.js"), path.join(src, ".opencode/plugins/xinf.js"));
+    const git = (...a) => execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", ...a], { cwd: src });
+    git("init", "-q", "-b", "main"); git("add", "."); git("commit", "-qm", "x");
+    const run = (extra) => spawnSync("sh", [path.join(root, "scripts/install-opencode.sh")], { env: { PATH: process.env.PATH, HOME: cfg, XDG_CONFIG_HOME: cfg, XINF_PLUGIN_SOURCE: src, ...extra }, encoding: "utf8" });
+    let r = run({ XINF_BASE_URL: "https://staging.example/" });
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /opencode mcp auth xinf/);
+    const file = path.join(cfg, "opencode/opencode.json");
+    assert.deepEqual(JSON.parse(fs.readFileSync(file, "utf8")).mcp.xinf, { type: "remote", url: "https://staging.example/mcp/account", enabled: true });
+    fs.writeFileSync(file, JSON.stringify({ theme: "x", mcp: { other: { type: "remote", url: "https://o.example/mcp" } } }));
+    r = run({});
+    assert.equal(r.status, 0, r.stderr);
+    const merged = JSON.parse(fs.readFileSync(file, "utf8"));
+    assert.equal(merged.theme, "x");
+    assert.equal(merged.mcp.other.url, "https://o.example/mcp");
+    assert.equal(merged.mcp.xinf.url, MCP_URL);
+    assert.ok(fs.existsSync(path.join(cfg, "opencode/plugins/xinf.js")));
+  } finally {
+    fs.rmSync(cfg, { recursive: true, force: true });
+    fs.rmSync(src, { recursive: true, force: true });
+  }
 });
 
 test("OpenCode bootstrap is injected once", async () => {
@@ -87,19 +124,25 @@ test("OpenCode installer clones the canonical repo and copies the adapter", () =
 
 test("Pi adapter preserves other servers and references the key by name only", () => {
   const source = read(".pi/extensions/xinf.ts");
-  assert.match(source, /\.\.\.config, mcpServers: \{ \.\.\.servers, xinf: xinfServer\(env\) \}/);
+  assert.match(source, /\.\.\.config, mcpServers: \{ \.\.\.servers, xinf: xinfServer\(env, servers\.xinf\) \}/);
+  // the origin sticks: XINF_BASE_URL once, later starts without it keep that origin
+  assert.match(source, /if \(env\.XINF_BASE_URL\) return/);
+  assert.ok(source.includes('url.replace(/\\/mcp\\/account$/, "")'), "keeps the origin already in mcp.json");
   assert.match(source, /bearerTokenEnv: "XINF_API_KEY"/);
   assert.ok(!/process\.env\.XINF_API_KEY\s*[,}]/.test(source), "the key value must never be written");
 });
 
 test("README exposes one pasteable bootstrap command per client", () => {
   const readme = read("README.md");
-  const clients = ["Claude Code terminal", "Codex terminal", "Cursor chat", "Kimi chat", "Gemini terminal", "OpenCode terminal", "Pi terminal"];
-  for (const client of clients) {
+  // each row: | client | `one command` | what is left (the browser sign-in starts right after the command) |
+  const clients = { "Claude Code terminal": "claude mcp login", "Codex terminal": "codex mcp login", "Cursor terminal": "cursor-agent mcp login xinf", "Cursor chat": "/add-plugin", "Kimi chat": "/plugins install", "Gemini terminal": "&& gemini`", "OpenCode terminal": "opencode mcp auth xinf", "Pi terminal": "pi \"/mcp-auth xinf\"" };
+  for (const [client, signin] of Object.entries(clients)) {
     const row = readme.split("\n").find((line) => line.startsWith(`| ${client} |`));
     assert.ok(row, `missing bootstrap row for ${client}`);
-    assert.equal((row.match(/`/g) ?? []).length, 2, `${client} bootstrap must be one inline command`);
-    assert.ok(row.includes(REPO), `${client} must use ${REPO}`);
+    const paste = row.split(" | ")[1];
+    assert.equal((paste.match(/`/g) ?? []).length, 2, `${client} bootstrap must be one inline command`);
+    assert.ok(paste.includes(REPO), `${client} must use ${REPO}`);
+    assert.ok(paste.includes(signin), `${client} bootstrap must start the sign-in (${signin})`);
   }
   for (const client of ["Cline", "Windsurf", "Any OpenAI SDK"]) assert.ok(readme.includes(`| ${client} |`), `missing ${client}`);
   assert.match(readme, /claude plugin install xinf@xinf/);
@@ -114,8 +157,9 @@ test("every MCP adapter uses the canonical origin and the XINF_API_KEY bearer", 
   assert.deepEqual(readJson("plugins/xinf/.codex-plugin/plugin.json").mcpServers.xinf.env_http_headers, { Authorization: "XINF_AUTHORIZATION" });
   assert.deepEqual(readJson(".cursor-plugin/plugin.json").mcpServers.xinf, { url: MCP_URL });
   assert.equal(readJson("kimi.plugin.json").mcpServers.xinf.auth, "oauth");
-  assert.equal(readJson("gemini-extension.json").mcpServers.xinf.headers.Authorization, "Bearer ${XINF_API_KEY}");
-  assert.equal(readJson("clients/windsurf/mcp_config.json").mcpServers.xinf.headers.Authorization, "Bearer ${env:XINF_API_KEY}");
+  assert.deepEqual(readJson("gemini-extension.json").mcpServers.xinf, { type: "http", url: `\${XINF_BASE_URL:-${BASE_URL}}/mcp/account`, oauth: { enabled: true } });
+  assert.equal(readJson("gemini-extension.json").settings, undefined);
+  assert.deepEqual(readJson("clients/windsurf/mcp_config.json").mcpServers.xinf, { serverUrl: MCP_URL });
   assert.equal(readJson(".mcp.json").mcpServers.xinf.headersHelper, readJson("plugins/xinf/.mcp.json").mcpServers.xinf.headersHelper);
   assert.equal(read("kimi.plugin.json"), read(".kimi-plugin/plugin.json"));
 });
@@ -211,4 +255,35 @@ test("the SessionStart sign-in hint speaks only while Claude Code lists the serv
   fs.mkdirSync(path.join(home, ".xinf"));
   fs.writeFileSync(path.join(home, ".xinf/credentials"), "XINF_API_KEY=dummy\n");
   assert.equal(run(), "", "device login key saved: silent");
+});
+
+test("add-mcp adds the sign-in server to Cursor / Windsurf / Cline / Kimi configs, keeping other entries, with no key", () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "xinf-add-"));
+  const log = console.log;
+  console.log = () => {};
+  try {
+    const env = { HOME: home };
+    const cursor = path.join(home, ".cursor/mcp.json");
+    fs.mkdirSync(path.dirname(cursor), { recursive: true });
+    fs.writeFileSync(cursor, JSON.stringify({ mcpServers: { other: { url: "https://o.example/mcp" } }, extra: 1 }));
+    assert.equal(addMcp(["cursor", "--base-url", "https://staging.example/"], env), 0);
+    const c = JSON.parse(fs.readFileSync(cursor, "utf8"));
+    assert.deepEqual(c.mcpServers.xinf, { url: "https://staging.example/mcp/account" });
+    assert.equal(c.mcpServers.other.url, "https://o.example/mcp");
+    assert.equal(c.extra, 1);
+    assert.equal(addMcp(["windsurf"], env), 0);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(home, ".codeium/windsurf/mcp_config.json"), "utf8")).mcpServers.xinf, { serverUrl: MCP_URL });
+    assert.equal(addMcp(["kimi"], { ...env, XINF_BASE_URL: "https://staging.example" }), 0);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(home, ".kimi-code/mcp.json"), "utf8")).mcpServers.xinf, { url: "https://staging.example/mcp/account" });
+    const cline = targets("cline", env, "darwin");
+    assert.match(cline.files[0], /Library\/Application Support\/Code\/User\/globalStorage\/saoudrizwan\.claude-dev\/settings\/cline_mcp_settings\.json$/);
+    assert.deepEqual(cline.entry(MCP_URL), readJson("clients/cline/cline_mcp_settings.json").mcpServers.xinf);
+    assert.equal(addMcp(["nope"], env), 2);
+    fs.writeFileSync(cursor, "{ not json");
+    assert.throws(() => addMcp(["cursor"], env), /not valid JSON/);
+  } finally {
+    console.log = log;
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+  assert.ok(read("scripts/add-mcp.mjs").includes(`"${BASE_URL}"`));
 });

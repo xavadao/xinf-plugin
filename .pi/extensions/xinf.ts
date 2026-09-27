@@ -8,8 +8,16 @@ import mcpAdapter from "pi-mcp-adapter";
 
 const DEFAULT_BASE_URL = "https://zinf.ai";
 
-export function xinfServer(env: NodeJS.ProcessEnv = process.env) {
-  const origin = (env.XINF_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
+/** The origin: XINF_BASE_URL when set, else the one already in mcp.json (so `XINF_BASE_URL=<staging> pi` once sticks), else production. */
+export function xinfOrigin(env: NodeJS.ProcessEnv = process.env, existing?: unknown) {
+  if (env.XINF_BASE_URL) return env.XINF_BASE_URL.replace(/\/+$/, "");
+  const url = existing && typeof existing === "object" ? (existing as { url?: unknown }).url : undefined;
+  if (typeof url === "string" && /^https?:\/\/[^/]+\/mcp\/account$/.test(url)) return url.replace(/\/mcp\/account$/, "");
+  return DEFAULT_BASE_URL;
+}
+
+export function xinfServer(env: NodeJS.ProcessEnv = process.env, existing?: unknown) {
+  const origin = xinfOrigin(env, existing);
   // MCP sign-in: without a key the adapter signs in through the browser (`/mcp-auth xinf`)
   return {
     url: `${origin}/mcp/account`,
@@ -33,7 +41,7 @@ export function ensureXinfConfig(env: NodeJS.ProcessEnv = process.env) {
   const servers = (config.mcpServers && typeof config.mcpServers === "object")
     ? config.mcpServers as Record<string, unknown>
     : {};
-  const next = { ...config, mcpServers: { ...servers, xinf: xinfServer(env) } };
+  const next = { ...config, mcpServers: { ...servers, xinf: xinfServer(env, servers.xinf) } };
   const serialized = `${JSON.stringify(next, null, 2)}\n`;
   if (!fs.existsSync(configPath) || fs.readFileSync(configPath, "utf8") !== serialized) {
     fs.writeFileSync(configPath, serialized, { mode: 0o600 });

@@ -1,6 +1,6 @@
 {
   "name": "@xavadao/xinf-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Xava Inference for AI coding agents: every text, image, video and audio model on one account. Sign in from your agent and spend your balance within a daily cap.",
   "type": "module",
   "license": "MIT",

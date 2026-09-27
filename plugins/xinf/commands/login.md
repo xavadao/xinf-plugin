@@ -11,14 +11,14 @@ Never ask the user to paste a key or token into this chat, never read or print `
 
 - Claude Code: run `/mcp`, pick `plugin:xinf:xinf`, choose Authenticate; or, in a terminal, `claude mcp login plugin:xinf:xinf` (it opens the browser). (Without the plugin: `claude mcp add --transport http xinf <origin>/mcp/account && claude mcp login xinf`.) The origin is the plugin's `base_url` option (`/config`).
 - Claude Desktop or claude.ai: Settings > Connectors > Add custom connector, URL `<origin>/mcp/account`, then Connect.
-- Cursor: the `xinf` server shows "Needs login" in Settings > MCP: click it. The Cursor CLI uses `agent mcp login xinf`.
 - Codex: `codex mcp login xinf` (a fresh `codex mcp add xinf --url <origin>/mcp/account` starts it by itself).
-- Gemini CLI: `/mcp auth xinf`.
-- OpenCode: `opencode mcp auth xinf`.
+- Gemini CLI: it asks on start ("Authentication required for MCP Server: xinf ... continue?"): Enter. Later, or if dismissed: `/mcp auth xinf`.
+- Cursor: in a terminal `cursor-agent mcp login xinf` (also `agent mcp login xinf`); in the app, Settings > MCP, click "Needs login" next to `xinf`. Not configured yet: `curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/add-mcp.mjs | node --input-type=module - cursor`.
+- OpenCode: `opencode mcp auth xinf` (the installer puts the server in `~/.config/opencode/opencode.json`).
+- Pi: `/mcp-auth xinf` (or `pi "/mcp-auth xinf"` from a terminal).
+- Kimi Code: `/mcp-config login plugin-xinf:xinf` (installed as a plugin) or `/mcp-config login xinf` (added to `~/.kimi-code/mcp.json`); Kimi must be signed in, the login runs through its model.
 - Cline: MCP Servers panel > `xinf` > Authenticate.
-- Kimi: `kimi mcp auth xinf` (the server needs `"auth": "oauth"`, which the plugin sets).
-- Pi: `/mcp-auth xinf`.
-- Windsurf: use the device login below; Windsurf's MCP sign-in is not confirmed to work with us yet.
+- Windsurf: sign in to `xinf` from its MCP servers panel; if it offers no sign-in, use the device login below.
 
 **Device login (any tool, and `$ARGUMENTS` = device).** For tools that cannot sign in themselves, or headless machines:
 

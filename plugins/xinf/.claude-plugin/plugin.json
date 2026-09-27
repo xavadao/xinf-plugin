@@ -1,7 +1,7 @@
 {
   "name": "xinf",
   "description": "Xava Inference: every text, image, video and audio model on one account at list price. MCP tools with browser sign-in, skills for picking models and generating media, and a model-picker subagent.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Xava Inference"
   },

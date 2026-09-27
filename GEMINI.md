@@ -7,4 +7,4 @@ Read and follow `@./plugins/xinf/skills/using-xinf/SKILL.md` before calling any 
 - `@./plugins/xinf/skills/xinf-models-and-pricing/SKILL.md` to compare or choose models.
 - `@./plugins/xinf/skills/xinf-buybacks/SKILL.md` for the buyback token, Reward Status and $XINF.
 
-Sign in with `/mcp auth xinf`. Never print, log or commit the value of `XINF_API_KEY`. Never create, read or store a private key, wallet file or seed phrase. Never pay for an x402 call above the user's budget cap without asking first.
+Gemini CLI offers the browser sign-in when it connects (confirm with Enter); otherwise sign in with `/mcp auth xinf`. Never print, log or commit the value of `XINF_API_KEY`. Never create, read or store a private key, wallet file or seed phrase. Never pay for an x402 call above the user's budget cap without asking first.

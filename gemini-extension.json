@@ -1,22 +1,15 @@
 {
   "name": "xinf",
   "description": "Every text, image, video and audio model on one account at list price: sign in from your agent, spend your balance within a daily cap.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "contextFileName": "GEMINI.md",
   "mcpServers": {
     "xinf": {
-      "httpUrl": "https://zinf.ai/mcp/account",
-      "headers": {
-        "Authorization": "Bearer ${XINF_API_KEY}"
+      "type": "http",
+      "url": "${XINF_BASE_URL:-https://zinf.ai}/mcp/account",
+      "oauth": {
+        "enabled": true
       }
     }
-  },
-  "settings": [
-    {
-      "name": "API key",
-      "description": "Optional. Leave empty to sign in with your browser (/mcp auth xinf). Or an API key (xk_live_...) or the account API key saved by xinf-login.",
-      "envVar": "XINF_API_KEY",
-      "sensitive": true
-    }
-  ]
+  }
 }

@@ -28,6 +28,7 @@ export const REQUIRED = [
   "clients/windsurf/mcp_config.json",
   "clients/openai-sdk/.env.example",
   "scripts/install-opencode.sh",
+  "scripts/add-mcp.mjs",
   "plugins/xinf/.claude-plugin/plugin.json",
   "plugins/xinf/.codex-plugin/plugin.json",
   "plugins/xinf/.mcp.json",
@@ -109,12 +110,21 @@ check(/XINF_API_KEY/.test(canonical.headersHelper ?? "") && /\.xinf\/credentials
 const mcpUrls = {
   ".cursor-plugin/plugin.json": (m) => m.mcpServers?.xinf?.url,
   "kimi.plugin.json": (m) => m.mcpServers?.xinf?.url,
-  "gemini-extension.json": (m) => m.mcpServers?.xinf?.httpUrl,
   "clients/cline/cline_mcp_settings.json": (m) => m.mcpServers?.xinf?.url,
   "clients/windsurf/mcp_config.json": (m) => m.mcpServers?.xinf?.serverUrl,
 };
 for (const [relative, get] of Object.entries(mcpUrls)) check(get(json(relative)) === MCP_URL, `${relative} MCP url must be ${MCP_URL}`);
-for (const relative of [".opencode/plugins/xinf.js", ".pi/extensions/xinf.ts"]) {
+// Gemini: the origin comes from XINF_BASE_URL (the environment or ~/.gemini/extensions/xinf/.env), oauth.enabled makes
+// it sign in on connect, and no settings (an install prompt that hangs non-interactive installs) and no static
+// Authorization header (Gemini sends configured headers over the OAuth token, so a placeholder would win after sign-in)
+const gemini = json("gemini-extension.json");
+check(gemini.mcpServers?.xinf?.url === `\${XINF_BASE_URL:-${BASE_URL}}/mcp/account` && gemini.mcpServers?.xinf?.type === "http", "gemini-extension.json MCP url must be ${XINF_BASE_URL:-<base url>}/mcp/account (type http)");
+check(gemini.mcpServers?.xinf?.oauth?.enabled === true, "gemini-extension.json must set oauth.enabled (sign-in on connect)");
+check(!gemini.settings?.length && !gemini.mcpServers?.xinf?.headers, "gemini-extension.json must not declare settings or headers");
+for (const relative of [".cursor-plugin/plugin.json", "kimi.plugin.json", "clients/cline/cline_mcp_settings.json", "clients/windsurf/mcp_config.json"]) {
+  check(!json(relative).mcpServers?.xinf?.headers, `${relative} must not send a static Authorization header (it blocks the browser sign-in)`);
+}
+for (const relative of [".opencode/plugins/xinf.js", ".pi/extensions/xinf.ts", "scripts/add-mcp.mjs"]) {
   check(read(relative).includes(`"${BASE_URL}"`), `${relative} must default to ${BASE_URL}`);
 }
 // any absolute url to our origin or GitHub must be the canonical one
