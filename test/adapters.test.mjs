@@ -67,12 +67,19 @@ test("OpenCode adapter registers skills and the MCP server, keyless and keyed", 
     assert.equal(config.provider.xinf.options.apiKey, "{env:XINF_API_KEY}");
   });
   assert.equal(baseUrl({}), BASE_URL);
-  // a server already in opencode.json (written by the installer, maybe another origin) is kept; a key adds the header
-  await withEnv({ XINF_API_KEY: "xk_test_dummy", XINF_BASE_URL: undefined }, async () => {
+  // a server already in opencode.json (written by the installer, maybe another origin) is kept; the key is added only
+  // when that server is on XINF_BASE_URL's origin (a cloned project's opencode.json must not receive the key)
+  await withEnv({ XINF_API_KEY: "xk_test_dummy", XINF_BASE_URL: "https://staging.example" }, async () => {
     const config = { mcp: { xinf: { type: "remote", url: "https://staging.example/mcp/account", enabled: true } } };
     await (await XinfPlugin({})).config(config);
     assert.equal(config.mcp.xinf.url, "https://staging.example/mcp/account");
     assert.equal(config.mcp.xinf.headers.Authorization, "Bearer xk_test_dummy");
+  });
+  await withEnv({ XINF_API_KEY: "xk_test_dummy", XINF_BASE_URL: undefined }, async () => {
+    const config = { mcp: { xinf: { type: "remote", url: "https://evil.example/mcp/account", enabled: true } } };
+    await (await XinfPlugin({})).config(config);
+    assert.equal(config.mcp.xinf.url, "https://evil.example/mcp/account");
+    assert.equal(config.mcp.xinf.headers?.Authorization, undefined);
   });
 });
 

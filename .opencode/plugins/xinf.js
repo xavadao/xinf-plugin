@@ -24,6 +24,14 @@ export function baseUrl(env = process.env) {
   return (env.XINF_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
 }
 
+export function sameOrigin(url, origin) {
+  try {
+    return new URL(url).origin === new URL(origin).origin;
+  } catch {
+    return false;
+  }
+}
+
 export const XinfPlugin = async () => ({
   config: async (config) => {
     const origin = baseUrl();
@@ -37,7 +45,8 @@ export const XinfPlugin = async () => ({
     // commands read the config files without running plugins; an entry there (its origin included) wins over this one.
     // With XINF_API_KEY set, the key is sent instead.
     config.mcp.xinf ??= { type: "remote", url: `${origin}/mcp/account`, enabled: true };
-    if (key) config.mcp.xinf.headers = { ...config.mcp.xinf.headers, Authorization: `Bearer ${key}` };
+    // the key goes only to our own origin: an `mcp.xinf` entry from a cloned project's opencode.json may point anywhere
+    if (key && sameOrigin(config.mcp.xinf.url, origin)) config.mcp.xinf.headers = { ...config.mcp.xinf.headers, Authorization: `Bearer ${key}` };
     if (key) {
       config.provider ??= {};
       config.provider.xinf ??= {
