@@ -1,0 +1,28 @@
+{
+  "name": "xinf",
+  "description": "Xava Inference: every text, image, video and audio model on one account at list price. MCP tools with browser sign-in, skills for picking models and generating media, and a model-picker subagent.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xava Inference"
+  },
+  "homepage": "https://github.com/xavadao/xinf-plugin",
+  "repository": "https://github.com/xavadao/xinf-plugin",
+  "license": "MIT",
+  "keywords": [
+    "xinf",
+    "mcp",
+    "x402",
+    "image-generation",
+    "video-generation",
+    "text-to-speech",
+    "openai-compatible"
+  ],
+  "userConfig": {
+    "base_url": {
+      "type": "string",
+      "title": "Xava Inference origin",
+      "description": "The site this plugin signs in to and calls. Leave the default (production) unless the install command you copied set another one, such as staging or a local server.",
+      "default": "https://zinf.ai"
+    }
+  }
+}

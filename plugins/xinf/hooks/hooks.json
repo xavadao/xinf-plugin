@@ -1,0 +1,18 @@
+{
+  "description": "Xava Inference: a one-line sign-in reminder at session start, only while Claude Code lists the xinf MCP server as needing sign-in.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/signin-hint.sh"],
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "xinf": {
+      "type": "http",
+      "url": "${XINF_BASE_URL:-https://zinf.ai}/mcp/account",
+      "headersHelper": "sh -c 'k=$XINF_API_KEY; [ -n \"$k\" ] || k=$(sed -n \"s/^XINF_API_KEY=//p\" \"$HOME/.xinf/credentials\" 2>/dev/null); if [ -n \"$k\" ]; then printf \"{\\\"Authorization\\\":\\\"Bearer %s\\\"}\" \"$k\"; else printf \"{}\"; fi'"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "xinf": {
+      "serverUrl": "https://zinf.ai/mcp/account",
+      "headers": {
+        "Authorization": "Bearer ${env:XINF_API_KEY}"
+      }
+    }
+  }
+}

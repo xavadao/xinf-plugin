@@ -1,0 +1,4 @@
+interface:
+  display_name: "Buybacks and Reward Status"
+  short_description: "Explain the buyback token, Noob/Elite and XINF"
+  default_prompt: "Use $xinf-buybacks to explain how my buyback token and Reward Status work."

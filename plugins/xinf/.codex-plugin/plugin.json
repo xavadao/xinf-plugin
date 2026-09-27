@@ -1,0 +1,49 @@
+{
+  "name": "xinf",
+  "version": "0.1.0",
+  "description": "Every text, image, video and audio model on one account at list price: sign in from your agent, spend your balance within a daily cap.",
+  "author": {
+    "name": "Xava Inference",
+    "url": "https://zinf.ai"
+  },
+  "homepage": "https://github.com/xavadao/xinf-plugin#readme",
+  "repository": "https://github.com/xavadao/xinf-plugin",
+  "license": "MIT",
+  "keywords": [
+    "xinf",
+    "mcp",
+    "x402",
+    "image-generation",
+    "video-generation",
+    "skills"
+  ],
+  "skills": "./skills/",
+  "mcpServers": {
+    "xinf": {
+      "url": "https://zinf.ai/mcp/account",
+      "env_http_headers": {
+        "Authorization": "XINF_AUTHORIZATION"
+      }
+    }
+  },
+  "interface": {
+    "displayName": "Xava Inference",
+    "shortDescription": "Every model on one account, at list price",
+    "longDescription": "Call text, image, video and audio models from many providers through one account, check prices and balance, signed in from your agent with a daily spending cap.",
+    "developerName": "Xava Inference",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://zinf.ai",
+    "defaultPrompt": [
+      "Which image model is cheapest for a 1024x1024 product shot?",
+      "Generate a short 720p video of a lighthouse at dusk.",
+      "What is my Xava Inference balance and spend this week?",
+      "Pick a cost-effective model for summarising long PDFs."
+    ],
+    "brandColor": "#66F6D0"
+  }
+}

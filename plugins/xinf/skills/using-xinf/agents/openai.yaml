@@ -1,0 +1,4 @@
+interface:
+  display_name: "Using Xava Inference"
+  short_description: "Pick a model, call it, check keys and balance"
+  default_prompt: "Use $using-xinf to pick a model for this task and call it through Xava Inference."

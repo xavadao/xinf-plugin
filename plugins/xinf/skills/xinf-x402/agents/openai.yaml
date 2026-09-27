@@ -1,0 +1,4 @@
+interface:
+  display_name: "x402 pay-per-call"
+  short_description: "Explain x402 and pay per media call through an existing wallet provider, within a budget"
+  default_prompt: "Use $xinf-x402 to explain how x402 works here and whether this agent should pay per call or sign in."

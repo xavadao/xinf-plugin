@@ -1,0 +1,4 @@
+interface:
+  display_name: "Images, video and audio"
+  short_description: "Generate media and return the URLs"
+  default_prompt: "Use $xinf-media to generate this image and give me the URL and cost."

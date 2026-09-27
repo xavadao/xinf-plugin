@@ -1,0 +1,24 @@
+{
+  "name": "xinf",
+  "displayName": "Xava Inference",
+  "description": "Every text, image, video and audio model on one account at list price: sign in from your agent, spend your balance within a daily cap.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xava Inference"
+  },
+  "license": "MIT",
+  "keywords": [
+    "xinf",
+    "mcp",
+    "x402",
+    "skills"
+  ],
+  "skills": "./plugins/xinf/skills/",
+  "commands": "./plugins/xinf/commands/",
+  "agents": "./plugins/xinf/agents/",
+  "mcpServers": {
+    "xinf": {
+      "url": "https://zinf.ai/mcp/account"
+    }
+  }
+}

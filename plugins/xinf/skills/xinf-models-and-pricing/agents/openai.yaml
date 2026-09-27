@@ -1,0 +1,4 @@
+interface:
+  display_name: "Models and pricing"
+  short_description: "Compare list and Elite prices, choose cost-effectively"
+  default_prompt: "Use $xinf-models-and-pricing to find the most cost-effective model for this job."

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "xinf": {
+      "type": "streamableHttp",
+      "url": "https://zinf.ai/mcp/account"
+    }
+  }
+}

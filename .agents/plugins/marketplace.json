@@ -1,0 +1,19 @@
+{
+  "name": "xinf",
+  "interface": {
+    "displayName": "Xava Inference"
+  },
+  "plugins": [
+    {
+      "name": "xinf",
+      "source": {
+        "source": "local",
+        "path": "./plugins/xinf"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "@xavadao/xinf-plugin",
+  "version": "0.1.0",
+  "description": "Xava Inference for AI coding agents: every text, image, video and audio model on one account. Sign in from your agent and spend your balance within a daily cap.",
+  "type": "module",
+  "license": "MIT",
+  "repository": "https://github.com/xavadao/xinf-plugin",
+  "xinf": {
+    "repo": "xavadao/xinf-plugin",
+    "baseUrl": "https://zinf.ai"
+  },
+  "keywords": [
+    "pi-package",
+    "xinf",
+    "mcp",
+    "x402",
+    "codex-plugin",
+    "claude-plugin",
+    "skills",
+    "inference"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "validate": "node scripts/validate.mjs",
+    "retarget": "node scripts/retarget.mjs"
+  },
+  "pi": {
+    "extensions": [
+      "./.pi/extensions/xinf.ts"
+    ],
+    "skills": [
+      "./plugins/xinf/skills"
+    ]
+  },
+  "dependencies": {
+    "pi-mcp-adapter": "2.11.0"
+  },
+  "bundledDependencies": [
+    "pi-mcp-adapter"
+  ],
+  "bin": {
+    "xinf-login": "bin/xinf-login.mjs"
+  },
+  "engines": {
+    "node": ">=20.18.1"
+  }
+}
