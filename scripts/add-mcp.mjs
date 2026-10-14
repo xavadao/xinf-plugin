@@ -2,7 +2,7 @@
 // Add the Xava Inference MCP server (sign-in endpoint <origin>/mcp/account, no key) to a client's MCP config file,
 // keeping every other entry. No dependencies; Node 18+.
 //   curl -fsSL https://raw.githubusercontent.com/xavadao/xinf-plugin/main/scripts/add-mcp.mjs | node - cursor
-//   node scripts/add-mcp.mjs <cursor|windsurf|cline|kimi> [--base-url https://zinf.dev] [--login]   (or XINF_BASE_URL)
+//   node scripts/add-mcp.mjs <cursor|windsurf|cline|kimi|omp> [--base-url https://zinf.dev] [--login]   (or XINF_BASE_URL)
 // Then the client signs in with the browser: Cursor CLI `cursor-agent mcp login xinf` (--login runs it when the Cursor
 // CLI is installed), Cursor / Windsurf / Cline: click the server's login button, Kimi Code: `/mcp-config login xinf`.
 import fs from "node:fs";
@@ -10,7 +10,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-export const DEFAULT_BASE_URL = "https://zinf.ai";
+export const DEFAULT_BASE_URL = "https://xavainf.com";
 
 /** Where each client keeps its user-level MCP config, and the entry it expects. */
 export function targets(client, env = process.env, platform = process.platform) {
@@ -19,6 +19,16 @@ export function targets(client, env = process.env, platform = process.platform) 
     : platform === "win32" ? path.join(env.APPDATA || path.join(home, "AppData/Roaming"), "Code/User")
     : path.join(env.XDG_CONFIG_HOME || path.join(home, ".config"), "Code/User");
   switch (client) {
+    case "omp": {
+      const selected = (env.OMP_PROFILE ?? env.PI_PROFILE ?? "").trim();
+      const profile = selected === "default" ? "" : selected;
+      if (profile && (!/^[a-z0-9][a-z0-9._-]{0,63}$/.test(profile) || profile.endsWith(".") || /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\.|$)/i.test(profile))) throw new Error("Invalid Oh My Pi profile name");
+      const configRoot = path.join(home, env.PI_CONFIG_DIR || ".omp");
+      const agentDir = profile ? path.join(configRoot, "profiles", profile, "agent")
+        : env.PI_CODING_AGENT_DIR ? path.resolve(env.PI_CODING_AGENT_DIR) : path.join(configRoot, "agent");
+      return { files: [path.join(agentDir, "mcp.json")], serverName: "xinf:xinf", entry: (url) => ({ type: "http", url }),
+        next: "Oh My Pi: /mcp reauth xinf:xinf, then allow access in the browser" };
+    }
     case "cursor":
       return { files: [path.join(home, ".cursor/mcp.json")], entry: (url) => ({ url }), login: ["cursor-agent", ["mcp", "login", "xinf"]], next: "Cursor: Settings > MCP, click \"Needs login\" next to xinf. Cursor CLI: cursor-agent mcp login xinf" };
     case "windsurf": {
@@ -37,7 +47,7 @@ export function targets(client, env = process.env, platform = process.platform) 
   }
 }
 
-export function addServer(file, entry) {
+export function addServer(file, entry, name = "xinf") {
   let config = {};
   if (fs.existsSync(file)) {
     const text = fs.readFileSync(file, "utf8");
@@ -50,7 +60,7 @@ export function addServer(file, entry) {
     }
   }
   const servers = config.mcpServers && typeof config.mcpServers === "object" ? config.mcpServers : {};
-  const next = { ...config, mcpServers: { ...servers, xinf: entry } };
+  const next = { ...config, mcpServers: { ...servers, [name]: entry } };
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`);
 }
@@ -68,7 +78,7 @@ export function main(argv = process.argv.slice(2), env = process.env, run = spaw
   const origin = (i >= 0 ? argv[i + 1] : env.XINF_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
   const t = targets(client, env);
   if (!t) {
-    console.error("usage: add-mcp.mjs <cursor|windsurf|cline|kimi> [--base-url https://origin]");
+    console.error("usage: add-mcp.mjs <cursor|windsurf|cline|kimi|omp> [--base-url https://origin]");
     return 2;
   }
   if (!/^https?:\/\/[^/\s]+$/.test(origin)) {
@@ -77,8 +87,8 @@ export function main(argv = process.argv.slice(2), env = process.env, run = spaw
   }
   const url = `${origin}/mcp/account`;
   for (const file of t.files) {
-    addServer(file, t.entry(url));
-    console.log(`Added xinf (${url}) to ${file}`);
+    addServer(file, t.entry(url), t.serverName);
+    console.log(`Added ${t.serverName || "xinf"} (${url}) to ${file}`);
   }
   if (argv.includes("--login") && t.login && onPath(t.login[0], env)) {
     // the client's own login: opens the browser at once and waits for the Allow

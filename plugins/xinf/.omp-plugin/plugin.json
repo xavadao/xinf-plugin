@@ -1,0 +1,13 @@
+{
+  "name": "xinf",
+  "version": "0.1.1",
+  "description": "Xava Inference tools, skills, commands and model picker for Oh My Pi.",
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "mcpServers": {
+    "xinf": {
+      "type": "http",
+      "url": "${XINF_BASE_URL:-https://xavainf.com}/mcp/account"
+    }
+  }
+}

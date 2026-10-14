@@ -6,7 +6,7 @@
   "mcpServers": {
     "xinf": {
       "type": "http",
-      "url": "${XINF_BASE_URL:-https://zinf.ai}/mcp/account",
+      "url": "${XINF_BASE_URL:-https://xavainf.com}/mcp/account",
       "oauth": {
         "enabled": true
       }

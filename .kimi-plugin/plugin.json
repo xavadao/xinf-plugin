@@ -14,7 +14,7 @@
   "mcpServers": {
     "xinf": {
       "type": "http",
-      "url": "https://zinf.ai/mcp/account",
+      "url": "https://xavainf.com/mcp/account",
       "auth": "oauth"
     }
   },

@@ -4,7 +4,7 @@
   "description": "Every text, image, video and audio model on one account at list price: sign in from your agent, spend your balance within a daily cap.",
   "author": {
     "name": "Xava Inference",
-    "url": "https://zinf.ai"
+    "url": "https://xavainf.com"
   },
   "homepage": "https://github.com/xavadao/xinf-plugin#readme",
   "repository": "https://github.com/xavadao/xinf-plugin",
@@ -20,7 +20,7 @@
   "skills": "./skills/",
   "mcpServers": {
     "xinf": {
-      "url": "https://zinf.ai/mcp/account",
+      "url": "https://xavainf.com/mcp/account",
       "env_http_headers": {
         "Authorization": "XINF_AUTHORIZATION"
       }
@@ -37,7 +37,7 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://zinf.ai",
+    "websiteURL": "https://xavainf.com",
     "defaultPrompt": [
       "Which image model is cheapest for a 1024x1024 product shot?",
       "Generate a short 720p video of a lighthouse at dusk.",

@@ -22,7 +22,7 @@
       "type": "string",
       "title": "Xava Inference origin",
       "description": "The site this plugin signs in to and calls. Leave the default (production) unless the install command you copied set another one, such as staging or a local server.",
-      "default": "https://zinf.ai"
+      "default": "https://xavainf.com"
     }
   }
 }

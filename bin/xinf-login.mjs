@@ -2,7 +2,7 @@
 // xinf-login: sign in to Xava Inference from a terminal, for AI tools that cannot run the MCP browser sign-in
 // themselves. No dependencies, no npx: Node 18+ only.
 //
-//   node bin/xinf-login.mjs [--base-url https://zinf.ai] [--name "my laptop"] [--no-browser]
+//   node bin/xinf-login.mjs [--base-url https://xavainf.com] [--name "my laptop"] [--no-browser]
 //
 // 1. asks the server for a device code (POST /oauth/device)
 // 2. opens <origin>/login/device?code=XXXX-XXXX in the browser: sign in, check the code, pick a daily cap, Allow
@@ -15,7 +15,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const DEFAULT_BASE_URL = "https://zinf.ai";
+const DEFAULT_BASE_URL = "https://xavainf.com";
 
 function args(argv) {
   const out = { baseUrl: process.env.XINF_BASE_URL || DEFAULT_BASE_URL, name: `xinf-login on ${os.hostname()}`, browser: true };

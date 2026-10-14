@@ -6,7 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import mcpAdapter from "pi-mcp-adapter";
 
-const DEFAULT_BASE_URL = "https://zinf.ai";
+const DEFAULT_BASE_URL = "https://xavainf.com";
 
 /** The origin: XINF_BASE_URL when set, else the one already in mcp.json (so `XINF_BASE_URL=<staging> pi` once sticks), else production. */
 export function xinfOrigin(env: NodeJS.ProcessEnv = process.env, existing?: unknown) {

@@ -18,7 +18,7 @@
   "agents": "./plugins/xinf/agents/",
   "mcpServers": {
     "xinf": {
-      "url": "https://zinf.ai/mcp/account"
+      "url": "https://xavainf.com/mcp/account"
     }
   }
 }

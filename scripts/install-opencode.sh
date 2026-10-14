@@ -9,7 +9,7 @@ config_root="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
 plugin_root="$config_root/xinf-plugin"
 source_url="${XINF_PLUGIN_SOURCE:-https://github.com/xavadao/xinf-plugin.git}"
 ref="${XINF_PLUGIN_REF:-main}"
-origin="$(printf '%s' "${XINF_BASE_URL:-https://zinf.ai}" | sed 's#/*$##')"
+origin="$(printf '%s' "${XINF_BASE_URL:-https://xavainf.com}" | sed 's#/*$##')"
 
 if [ -d "$plugin_root/.git" ]; then
   git -C "$plugin_root" pull --ff-only

@@ -23,7 +23,7 @@ x402 is only for an agent that **already has a wallet provider with spending pol
 
 1. **Quote.** Send the request with no `Authorization` header. The answer is `402` with a `PAYMENT-REQUIRED` header (x402 v2, base64 JSON; the same JSON is the body). `accepts[0]` has `scheme: "exact"`, the Solana `network` (CAIP-2), the USDC `asset`, `amount` in USDC base units (6 decimals: `5000` = $0.005), `payTo`, `maxTimeoutSeconds: 60` and `extra.memo`, bound to this exact body and buyback token. Nothing is charged for a quote.
    ```bash
-   curl -i "${XINF_BASE_URL:-https://zinf.ai}/v1/images/generations" \
+   curl -i "${XINF_BASE_URL:-https://xavainf.com}/v1/images/generations" \
      -H "Content-Type: application/json" \
      -d '{"model":"pruna/p-image","prompt":"a lighthouse at dusk"}'
    ```

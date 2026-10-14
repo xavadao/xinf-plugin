@@ -7,7 +7,7 @@
   "repository": "https://github.com/xavadao/xinf-plugin",
   "xinf": {
     "repo": "xavadao/xinf-plugin",
-    "baseUrl": "https://zinf.ai"
+    "baseUrl": "https://xavainf.com"
   },
   "keywords": [
     "pi-package",
@@ -40,6 +40,20 @@
   ],
   "bin": {
     "xinf-login": "bin/xinf-login.mjs"
+  },
+  "exports": {
+    "./deepseek": "./clients/deepseek/index.mjs"
+  },
+  "dsh": {
+    "bundle": { "patch": "./clients/deepseek/cordis.patch.yml" }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-mcp-client": "^0.2.0-0 || ^0.2.1-0",
+    "@deepseek-ai/dsh-skill-filesystem": "^0.2.0-0 || ^0.2.1-0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-mcp-client": { "optional": true },
+    "@deepseek-ai/dsh-skill-filesystem": { "optional": true }
   },
   "engines": {
     "node": ">=20.18.1"

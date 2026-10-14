@@ -31,6 +31,9 @@ export const REQUIRED = [
   "scripts/add-mcp.mjs",
   "plugins/xinf/.claude-plugin/plugin.json",
   "plugins/xinf/.codex-plugin/plugin.json",
+  "plugins/xinf/.omp-plugin/plugin.json",
+  "clients/deepseek/index.mjs",
+  "clients/deepseek/cordis.patch.yml",
   "plugins/xinf/.mcp.json",
   "plugins/xinf/hooks/hooks.json",
   "plugins/xinf/hooks/signin-hint.sh",
@@ -49,6 +52,7 @@ for (const relative of textFiles().filter((f) => f.endsWith(".json"))) json(rela
 const versioned = [
   ".cursor-plugin/plugin.json", ".kimi-plugin/plugin.json", "gemini-extension.json", "kimi.plugin.json",
   "plugins/xinf/.claude-plugin/plugin.json",
+  "plugins/xinf/.omp-plugin/plugin.json",
 ];
 for (const relative of versioned) {
   const m = json(relative);
@@ -88,6 +92,14 @@ check(rootMcp.headersHelper === json("plugins/xinf/.mcp.json").mcpServers?.xinf?
 check(json("opencode.json").plugin?.includes("./.opencode/plugins/xinf.js"), "opencode.json must load the adapter");
 check(/@\.\/plugins\/xinf\/skills\/using-xinf\/SKILL\.md/.test(read("GEMINI.md")), "GEMINI.md must load using-xinf");
 check(json("package.json").pi?.skills?.includes("./plugins/xinf/skills"), "package.json pi.skills must be the bundle");
+const omp = json("plugins/xinf/.omp-plugin/plugin.json");
+check(omp.skills === "./skills/" && omp.commands === "./commands/", "Oh My Pi must use the canonical skills and commands");
+check(omp.mcpServers?.xinf?.type === "http" && omp.mcpServers?.xinf?.url === `\${XINF_BASE_URL:-${BASE_URL}}/mcp/account`, "Oh My Pi MCP must use the canonical origin with an environment override");
+check(!omp.mcpServers?.xinf?.headers, "Oh My Pi must use browser OAuth without a static Authorization header");
+check(pkg.dsh?.bundle?.patch === "./clients/deepseek/cordis.patch.yml", "DeepSeek must declare its bundle patch");
+check(pkg.exports?.["./deepseek"] === "./clients/deepseek/index.mjs", "DeepSeek must export its adapter");
+check(read("clients/deepseek/cordis.patch.yml").includes(`name: '${pkg.name}/deepseek'`), "DeepSeek bundle must load its adapter");
+check(read("clients/deepseek/index.mjs").includes("../../plugins/xinf/skills/"), "DeepSeek must load canonical skills");
 
 // ---- MCP urls: every adapter uses the canonical origin ----
 const canonical = json("plugins/xinf/.mcp.json").mcpServers?.xinf ?? {};
@@ -124,7 +136,7 @@ check(!gemini.settings?.length && !gemini.mcpServers?.xinf?.headers, "gemini-ext
 for (const relative of [".cursor-plugin/plugin.json", "kimi.plugin.json", "clients/cline/cline_mcp_settings.json", "clients/windsurf/mcp_config.json"]) {
   check(!json(relative).mcpServers?.xinf?.headers, `${relative} must not send a static Authorization header (it blocks the browser sign-in)`);
 }
-for (const relative of [".opencode/plugins/xinf.js", ".pi/extensions/xinf.ts", "scripts/add-mcp.mjs"]) {
+for (const relative of [".opencode/plugins/xinf.js", ".pi/extensions/xinf.ts", "scripts/add-mcp.mjs", "clients/deepseek/index.mjs"]) {
   check(read(relative).includes(`"${BASE_URL}"`), `${relative} must default to ${BASE_URL}`);
 }
 // any absolute url to our origin or GitHub must be the canonical one

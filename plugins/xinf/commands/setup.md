@@ -9,7 +9,7 @@ Never ask the user to paste a key or token into this chat, never read or print `
 
 **Sign in (recommended)**
 
-Run `/xinf:login`: the tool opens the browser, the user signs in (Google, X, email, passkey or a Solana wallet in the browser), picks a daily spending cap (default $5 a day) and clicks Allow. Every tool, images, video and audio included, then spends the account balance within that cap. The connection shows up in the dashboard under API keys > Connected apps, where the cap is changed or the app revoked. Top up by card or USDC at `${XINF_BASE_URL:-https://zinf.ai}/dashboard`.
+Run `/xinf:login`: the tool opens the browser, the user signs in (Google, X, email, passkey or a Solana wallet in the browser), picks a daily spending cap (default $5 a day) and clicks Allow. Every tool, images, video and audio included, then spends the account balance within that cap. The connection shows up in the dashboard under API keys > Connected apps, where the cap is changed or the app revoked. Top up by card or USDC at `${XINF_BASE_URL:-https://xavainf.com}/dashboard`.
 
 **Device login (tools that cannot sign in themselves)**
 
@@ -17,7 +17,7 @@ Run `/xinf:login`: the tool opens the browser, the user signs in (Google, X, ema
 
 **API key (your own code, CI)**
 
-1. Create a key in the dashboard at `${XINF_BASE_URL:-https://zinf.ai}/dashboard/keys`. The key is shown once.
+1. Create a key in the dashboard at `${XINF_BASE_URL:-https://xavainf.com}/dashboard/keys`. The key is shown once.
 2. The user adds it to the shell profile (`~/.zshrc`, `~/.bashrc`) or a secret manager that exports it:
    `export XINF_API_KEY=xk_live_...`
 3. Optional, for staging or a local server: in Claude Code set the plugin's `base_url` option (`/config`, or reinstall with `--config base_url=https://zinf.dev`); elsewhere `export XINF_BASE_URL=https://zinf.dev` (or `http://localhost:8791`).

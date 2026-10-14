@@ -3,7 +3,7 @@ description: Sign in to Xava Inference from this AI tool with the browser (no AP
 argument-hint: "[device]"
 ---
 
-Load `using-xinf` and help the user sign in. The MCP server is `<origin>/mcp/account` (`${user_config.base_url}` in Claude Code, default https://zinf.ai): it answers an unauthenticated connection with HTTP 401, which makes the AI tool open the browser. The user signs in on our site, reads the consent screen ("Allow <app> to use your Xava Inference account"), picks a daily spending cap (default $5 a day) and clicks Allow. The tool then receives a token by itself. The connection shows up in the dashboard under API keys > Connected apps, where the cap can be changed and the app disconnected.
+Load `using-xinf` and help the user sign in. The MCP server is `<origin>/mcp/account` (`${user_config.base_url}` in Claude Code, default https://xavainf.com): it answers an unauthenticated connection with HTTP 401, which makes the AI tool open the browser. The user signs in on our site, reads the consent screen ("Allow <app> to use your Xava Inference account"), picks a daily spending cap (default $5 a day) and clicks Allow. The tool then receives a token by itself. The connection shows up in the dashboard under API keys > Connected apps, where the cap can be changed and the app disconnected.
 
 Never ask the user to paste a key or token into this chat, never read or print `~/.xinf/credentials`, and never echo a secret. The user runs the commands that create secrets.
 

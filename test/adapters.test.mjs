@@ -142,7 +142,7 @@ test("Pi adapter preserves other servers and references the key by name only", (
 test("README exposes one pasteable bootstrap command per client", () => {
   const readme = read("README.md");
   // each row: | client | `one command` | what is left (the browser sign-in starts right after the command) |
-  const clients = { "Claude Code terminal": "claude mcp login", "Codex terminal": "codex mcp login", "Cursor terminal": "- cursor --login", "Cursor chat": "/add-plugin", "Kimi chat": "/plugins install", "Gemini terminal": "&& gemini`", "OpenCode terminal": "opencode mcp auth xinf", "Pi terminal": "pi \"/mcp-auth xinf\"" };
+  const clients = { "Claude Code terminal": "claude mcp login", "Codex terminal": "codex mcp login", "Cursor terminal": "- cursor --login", "Cursor chat": "/add-plugin", "Kimi chat": "/plugins install", "Gemini terminal": "&& gemini`", "OpenCode terminal": "opencode mcp auth xinf", "Pi terminal": "pi \"/mcp-auth xinf\"", "Oh My Pi terminal": "&& omp`", "DeepSeek Harness terminal": "node xinf-login.mjs --base-url" };
   for (const [client, signin] of Object.entries(clients)) {
     const row = readme.split("\n").find((line) => line.startsWith(`| ${client} |`));
     assert.ok(row, `missing bootstrap row for ${client}`);

@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const DEFAULT_BASE_URL = "https://zinf.ai";
+export const DEFAULT_BASE_URL = "https://xavainf.com";
 
 const adapterDir = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(adapterDir, "../..");

@@ -26,7 +26,7 @@ Never invent a model id. If `list_models` does not return it, it is not availabl
 Use the OpenAI-compatible API with the same model ids:
 
 ```bash
-OPENAI_BASE_URL=${XINF_BASE_URL:-https://zinf.ai}/v1
+OPENAI_BASE_URL=${XINF_BASE_URL:-https://xavainf.com}/v1
 OPENAI_API_KEY=$XINF_API_KEY
 ```
 
